@@ -1,0 +1,51 @@
+body { 
+    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+    line-height: 1.8; 
+    padding: 20px; 
+    max-width: 600px; 
+    margin: auto; 
+    background-color: #fdfdfd;
+    color: #333;
+}
+h1 { font-size: 24px; color: #2c3e50; border-bottom: 2px solid #4a90e2; padding-bottom: 8px; }
+h2 { font-size: 20px; color: #2c3e50; margin-top: 30px; border-left: 5px solid #4a90e2; padding-left: 10px; }
+h3 { font-size: 18px; color: #e67e22; margin-bottom: 10px; }
+p { margin-bottom: 1.5em; font-size: 18px; }
+ul { margin-bottom: 1.5em; padding-left: 20px; }
+li { margin-bottom: 10px; font-size: 18px; list-style-type: disc; }
+.bible-box { 
+    background-color: #f0f4f8; 
+    border: 1px solid #d1d9e1; 
+    padding: 15px; 
+    border-radius: 8px; 
+    font-style: italic; 
+    margin: 20px 0;
+}
+blockquote{
+    background-color: #f0f4f8; 
+    border: 1px solid #d1d9e1; 
+    padding: 15px; 
+    border-radius: 8px; 
+    font-style: italic; 
+    margin: 20px 0;
+}
+.highlight { 
+    font-weight: bold; 
+    background: linear-gradient(transparent 60%, #ffff66 60%); 
+}
+.footer { 
+    margin-top: 40px; 
+    padding: 20px; 
+    background-color: #eee; 
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+
+.X_container { width: 100%; max-width: 600px; margin: 0 auto; background: #fff; padding: 20px; box-sizing: border-box; }
+blockquote { border-left: 4px solid #ccc; padding: 10px 15px; margin: 1.5em 0; color: #666; background: #fafafa; }
+.table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 20px 0; }
+table { border-collapse: collapse; min-width: 400px; width: 100%; font-size: 0.9em; }
+th, td { border: 1px solid #ddd; padding: 12px 8px; text-align: left; }
+th { background: #eee; font-weight: bold; }
+hr { border: 0; border-top: 1px solid #ddd; margin: 2.5em 0; }

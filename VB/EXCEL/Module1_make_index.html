@@ -1,0 +1,94 @@
+Attribute VB_Name = "Module1"
+Sub CreateTableHTML_WithLastModified()
+    Dim ws As Worksheet
+    Dim lastRow As Long
+    Dim i As Long
+    Dim htmlContent As String
+    Dim filePath As Variant
+    Dim folderPath As String
+    Dim targetFileName As String
+    Dim fullPath As String
+    Dim fso As Object
+    Dim lastModified As String
+    Dim cacheBuster As String
+
+    Set ws = ActiveSheet
+    Set fso = CreateObject("Scripting.FileSystemObject")
+    
+    ' 保存先を先に決める（リンク先ファイルを探す基準フォルダになります）
+    filePath = Application.GetSaveAsFilename(InitialFileName:="index.html", FileFilter:="HTML Files (*.html), *.html")
+    If filePath = False Then Exit Sub
+    
+    ' 保存先のフォルダパスを取得
+    folderPath = fso.GetParentFolderName(filePath) & "\"
+
+    ' HTMLのヘッダーとキャッシュ無効化設定
+    htmlContent = "<!DOCTYPE html>" & vbCrLf & _
+                  "<html lang=""ja"">" & vbCrLf & _
+                  "<head>" & vbCrLf & _
+                  "    <meta charset=""UTF-8"">" & vbCrLf & _
+                  "    <meta http-equiv=""Cache-Control"" content=""no-cache, no-store, must-revalidate"">" & vbCrLf & _
+                  "    <meta http-equiv=""Pragma"" content=""no-cache"">" & vbCrLf & _
+                  "    <meta http-equiv=""Expires"" content=""0"">" & vbCrLf & _
+                  "    <title>ドキュメント一覧</title>" & vbCrLf & _
+                  "    <style>" & vbCrLf & _
+                  "        table { border-collapse: collapse; width: 100%; font-family: sans-serif; }" & vbCrLf & _
+                  "        th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }" & vbCrLf & _
+                  "        th { background-color: #f2f2f2; }" & vbCrLf & _
+                  "        tr:hover { background-color: #f9f9f9; }" & vbCrLf & _
+                  "        a { color: #0066cc; text-decoration: none; font-weight: bold; }" & vbCrLf & _
+                  "    </style>" & vbCrLf & _
+                  "</head>" & vbCrLf & _
+                  "<body>" & vbCrLf & _
+                  "    <h2>ドキュメント一覧</h2>" & vbCrLf & _
+                  "    <table>" & vbCrLf & _
+                  "        <tr>" & vbCrLf & _
+                  "            <th>" & ws.Cells(1, 1).Value & "</th>" & vbCrLf & _
+                  "            <th>" & ws.Cells(1, 2).Value & "</th>" & vbCrLf & _
+                  "            <th>リンク</th>" & vbCrLf & _
+                  "            <th>ファイルの更新日</th>" & vbCrLf & _
+                  "        </tr>" & vbCrLf
+
+    lastRow = ws.Cells(ws.Rows.Count, "A").End(xlUp).Row
+
+    ' データ行の作成
+    For i = 2 To lastRow
+        targetFileName = ws.Cells(i, 3).Value & ".html"
+        fullPath = folderPath & targetFileName
+        lastModified = "-"
+        cacheBuster = Format(Now, "yymmddhhnnss") ' ファイルがない場合の予備
+
+        ' リンク先ファイルが実在すれば更新日時を取得
+        If ws.Cells(i, 3).Value <> "" And fso.FileExists(fullPath) Then
+            lastModified = fso.GetFile(fullPath).DateLastModified
+            cacheBuster = Format(lastModified, "yymmddhhnnss") ' 更新日時をIDにする
+        End If
+
+        htmlContent = htmlContent & "        <tr>" & vbCrLf
+        htmlContent = htmlContent & "            <td>" & ws.Cells(i, 1).Text & "</td>" & vbCrLf
+        htmlContent = htmlContent & "            <td>" & ws.Cells(i, 2).Text & "</td>" & vbCrLf
+        
+        ' リンク部分（?v=日時 を付けてキャッシュを回避）
+        If ws.Cells(i, 3).Value <> "" Then
+            htmlContent = htmlContent & "            <td><a href=""" & targetFileName & "?v=" & cacheBuster & """>開く</a></td>" & vbCrLf
+        Else
+            htmlContent = htmlContent & "            <td>-</td>" & vbCrLf
+        End If
+        htmlContent = htmlContent & "            <td>" & lastModified & "</td>" & vbCrLf
+        
+        htmlContent = htmlContent & "        </tr>" & vbCrLf
+    Next i
+
+    htmlContent = htmlContent & "    </table>" & vbCrLf & "</body>" & vbCrLf & "</html>"
+
+    ' ファイル書き出し
+    Dim ts As Object
+    Set ts = fso.CreateTextFile(filePath, True, True)
+    ts.Write htmlContent
+    ts.Close
+    
+    MsgBox "HTMLファイルを作成しました！" & vbCrLf & "更新日を反映するため、リンク先と同じフォルダに保存してください。", vbInformation
+End Sub
+
+
+
