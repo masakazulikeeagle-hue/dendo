@@ -1,95 +1,90 @@
 Attribute VB_Name = "Module1"
-Sub CreateTableHTML_WithLastModified()
+Sub CreateTableHTML_Fixed()
     Dim ws As Worksheet
-    Dim lastRow As Long
-    Dim i As Long
+    Dim lastRow As Long, i As Long
     Dim htmlContent As String
-    Dim filePath As Variant
-    Dim folderPath As String
-    Dim targetFileName As String
-    Dim fullPath As String
-    Dim fso As Object
-    Dim lastModified As String
-    Dim cacheBuster As String
+    Dim filePath As Variant, folderPath As String
+    Dim targetFileName As String, fullPath As String
+    Dim fso As Object, lastModified As String, cacheBuster As String
 
     Set ws = ActiveSheet
     Set fso = CreateObject("Scripting.FileSystemObject")
     
-    ' 保存先を先に決める（リンク先ファイルを探す基準フォルダになります）
     filePath = Application.GetSaveAsFilename(InitialFileName:="index.html", FileFilter:="HTML Files (*.html), *.html")
     If filePath = False Then Exit Sub
-    
-    ' 保存先のフォルダパスを取得
     folderPath = fso.GetParentFolderName(filePath) & "\"
 
-    ' HTMLのヘッダーとキャッシュ無効化設定
-    htmlContent = "<!DOCTYPE html>" & vbCrLf & _
-                  "<html lang=""ja"">" & vbCrLf & _
-                  "<head>" & vbCrLf & _
-                  "    <meta charset=""UTF-8"">" & vbCrLf & _
-                  "    <meta http-equiv=""Cache-Control"" content=""no-cache, no-store, must-revalidate"">" & vbCrLf & _
-                  "    <meta http-equiv=""Pragma"" content=""no-cache"">" & vbCrLf & _
-                  "    <meta http-equiv=""Expires"" content=""0"">" & vbCrLf & _
-                  "    <title>ドキュメント一覧</title>" & vbCrLf & _
-                  "    <style>" & vbCrLf & _
-                  "        table { border-collapse: collapse; width: 100%; font-family: sans-serif; }" & vbCrLf & _
-                  "        th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }" & vbCrLf & _
-                  "        th { background-color: #f2f2f2; }" & vbCrLf & _
-                  "        tr:hover { background-color: #f9f9f9; }" & vbCrLf & _
-                  "        a { color: #0066cc; text-decoration: none; font-weight: bold; }" & vbCrLf & _
-                  "    </style>" & vbCrLf & _
-                  "</head>" & vbCrLf
-    htmlContent = htmlContent + "<body>" & vbCrLf & _
-                  "    <h2>ドキュメント一覧</h2>" & vbCrLf & _
-                  "    <table>" & vbCrLf & _
-                  "        <tr>" & vbCrLf & _
-                  "            <th>" & "" & "</th>" & vbCrLf & _
-                  "            <th>" & ws.Cells(1, 1).Value & "</th>" & vbCrLf & _
-                  "            <th>" & ws.Cells(1, 2).Value & "</th>" & vbCrLf & _
-                  "            <th>リンク</th>" & vbCrLf & _
-                  "            <th>ファイルの更新日</th>" & vbCrLf & _
-                  "        </tr>" & vbCrLf
+    ' --- HTMLヘッダー部分（分割して代入） ---
+    htmlContent = "<!DOCTYPE html>" & vbCrLf
+    htmlContent = htmlContent & "<html lang=""ja"">" & vbCrLf
+    htmlContent = htmlContent & "<head>" & vbCrLf
+    htmlContent = htmlContent & "    <meta charset=""UTF-8"">" & vbCrLf
+    htmlContent = htmlContent & "    <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">" & vbCrLf
+    htmlContent = htmlContent & "    <meta http-equiv=""Cache-Control"" content=""no-cache, no-store, must-revalidate"">" & vbCrLf
+    htmlContent = htmlContent & "    <meta http-equiv=""Pragma"" content=""no-cache"">" & vbCrLf
+    htmlContent = htmlContent & "    <meta http-equiv=""Expires"" content=""0"">" & vbCrLf
+    htmlContent = htmlContent & "    <title>ドキュメント一覧</title>" & vbCrLf
+    
+    ' --- スタイルシート部分（分割） ---
+    htmlContent = htmlContent & "    <style>" & vbCrLf
+    htmlContent = htmlContent & "        body { font-family: -apple-system, sans-serif; margin: 10px; color: #333; }" & vbCrLf
+    htmlContent = htmlContent & "        h2 { font-size: 1.2rem; border-left: 4px solid #007aff; padding-left: 8px; }" & vbCrLf
+    htmlContent = htmlContent & "        .table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; }" & vbCrLf
+    htmlContent = htmlContent & "        table { border-collapse: collapse; width: 100%; min-width: 450px; font-size: 14px; }" & vbCrLf
+    htmlContent = htmlContent & "        th, td { border-bottom: 1px solid #eee; padding: 12px 8px; text-align: left; }" & vbCrLf
+    htmlContent = htmlContent & "        th { background-color: #f2f2f2; }" & vbCrLf
+    htmlContent = htmlContent & "        .btn-open { display: inline-block; padding: 6px 12px; background-color: #007aff; color: white; text-decoration: none; border-radius: 6px; }" & vbCrLf
+    htmlContent = htmlContent & "    </style>" & vbCrLf
+    htmlContent = htmlContent & "</head>" & vbCrLf
+
+    ' --- ボディ開始 ---
+    htmlContent = htmlContent & "<body>" & vbCrLf
+    htmlContent = htmlContent & "    <h2>ドキュメント一覧</h2>" & vbCrLf
+    htmlContent = htmlContent & "    <div class=""table-container"">" & vbCrLf
+    htmlContent = htmlContent & "    <table>" & vbCrLf
+    htmlContent = htmlContent & "        <tr>" & vbCrLf
+    htmlContent = htmlContent & "            <th>No.</th><th>" & ws.Cells(1, 1).Value & "</th><th>" & ws.Cells(1, 2).Value & "</th>" & vbCrLf
+    htmlContent = htmlContent & "            <th>操作</th><th>更新日時</th>" & vbCrLf
+    htmlContent = htmlContent & "        </tr>" & vbCrLf
 
     lastRow = ws.Cells(ws.Rows.Count, "A").End(xlUp).Row
 
-    ' データ行の作成
+    ' --- データ行の生成 ---
     For i = 2 To lastRow
         targetFileName = ws.Cells(i, 3).Value & ".html"
         fullPath = folderPath & targetFileName
         lastModified = "-"
-        cacheBuster = Format(Now, "yymmddhhnnss") ' ファイルがない場合の予備
+        cacheBuster = Format(Now, "yymmddhhnnss")
 
-        ' リンク先ファイルが実在すれば更新日時を取得
         If ws.Cells(i, 3).Value <> "" And fso.FileExists(fullPath) Then
             lastModified = fso.GetFile(fullPath).DateLastModified
-            cacheBuster = Format(lastModified, "yymmddhhnnss") ' 更新日時をIDにする
+            cacheBuster = Format(lastModified, "yymmddhhnnss")
         End If
 
         htmlContent = htmlContent & "        <tr>" & vbCrLf
-        htmlContent = htmlContent & "            <td>" & lastRow - i + 1 & "</td>" & vbCrLf
-        htmlContent = htmlContent & "            <td>" & ws.Cells(i, 1).Text & "</td>" & vbCrLf
-        htmlContent = htmlContent & "            <td>" & ws.Cells(i, 2).Text & "</td>" & vbCrLf
+        htmlContent = htmlContent & "            <td>" & Format(lastRow - i + 1, "00") & "</td>" & vbCrLf
+        htmlContent = htmlContent & "            <td style=""white-space:nowrap;"">" & ws.Cells(i, 1).Text & "</td>" & vbCrLf
+        htmlContent = htmlContent & "            <td style=""font-weight:bold;"">" & ws.Cells(i, 2).Text & "</td>" & vbCrLf
         
-        ' リンク部分（?v=日時 を付けてキャッシュを回避）
         If ws.Cells(i, 3).Value <> "" Then
-            htmlContent = htmlContent & "            <td><a href=""" & targetFileName & "?v=" & cacheBuster & """>開く</a></td>" & vbCrLf
+            htmlContent = htmlContent & "            <td><a href=""" & targetFileName & "?v=" & cacheBuster & """ class=""btn-open"">開く</a></td>" & vbCrLf
         Else
             htmlContent = htmlContent & "            <td>-</td>" & vbCrLf
         End If
-        htmlContent = htmlContent & "            <td>" & lastModified & "</td>" & vbCrLf
         
+        htmlContent = htmlContent & "            <td style=""font-size:12px;color:#666;"">" & lastModified & "</td>" & vbCrLf
         htmlContent = htmlContent & "        </tr>" & vbCrLf
     Next i
 
-    htmlContent = htmlContent & "    </table>" & vbCrLf & "</body>" & vbCrLf & "</html>"
+    htmlContent = htmlContent & "    </table>" & vbCrLf & "    </div>" & vbCrLf & "</body>" & vbCrLf & "</html>"
 
-    ' ファイル書き出し
-    Dim ts As Object
-    Set ts = fso.CreateTextFile(filePath, True, True)
-    ts.Write htmlContent
-    ts.Close
+    ' --- 書き出し ---
+    With fso.CreateTextFile(filePath, True, True)
+        .Write htmlContent
+        .Close
+    End With
     
-    MsgBox "HTMLファイルを作成しました！" & vbCrLf & "更新日を反映するため、リンク先と同じフォルダに保存してください。", vbInformation
+    MsgBox "HTMLファイルを作成しました！", vbInformation
 End Sub
 
 
