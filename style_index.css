@@ -1,0 +1,31 @@
+body { 
+    font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+    line-height: 1.8; 
+    padding: 20px; 
+    margin: auto; 
+    background-color: #fdfdfd;
+    color: #333;
+}
+table { border-collapse: collapse; width: 100%; font-family: sans-serif; }
+th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
+th { background-color: #f2f2f2; }
+tr:hover { background-color: #f9f9f9; }
+tr:nth-child(2) {  height: 80px;  background-color: #fafafa;font-size: 24px;}
+a { color: #0066cc; text-decoration: none; font-weight: bold; }
+.btn-open {
+  display: inline-block;       /* ボタンとして幅と高さを持たせる */
+  text-decoration: none;       /* 下線を消す */
+  background-color: #007bff;   /* ボタンの色（青色） */
+  color: white;                /* 文字の色 */
+  padding: 10px 20px;          /* 上下と左右の余白 */
+  border-radius: 5px;          /* 角を少し丸くする */
+  font-weight: bold;           /* 文字を太くする */
+  text-align: center;          /* 文字を中央に寄せる */
+  transition: 0.3s;            /* 変化を滑らかにする */
+}
+
+/* マウスを乗せた時の動き（スマホの場合はタップ時） */
+.btn-open:hover {
+  background-color: #0056b3;   /* 少し暗い青色にする */
+  opacity: 0.8;                /* 少し透明にする */
+}
